@@ -22,7 +22,7 @@ It was built specifically because the off-the-shelf option has real constraints 
 | PMI UAE branding | Limited theming | Full brand control |
 | Raw submission data | Summary export | Every row, in your own SQL database |
 | Attendee contact capture | Not supported | First/last name, email, optional phone |
-| Cost for the event | Annual licence | ~USD 0 (free tiers) |
+| Cost for the event | Annual licence | ~USD 0–19 (see note below) |
 
 > If the build is ever at risk, Kahoot 360 remains a valid fallback — see
 > [`docs/OPERATIONS.md`](docs/OPERATIONS.md#contingency-plans) for the switch-over plan.
@@ -73,9 +73,9 @@ actually good at:
 
 - **No connection ceiling.** Players poll a tiny JSON document instead of holding a socket open.
   There is nothing to exhaust.
-- **The origin sees ~1 request per second, not 1,000.** All delegates are in one room in Dubai,
-  so they hit one Netlify edge PoP. The 1-second cache collapses 1,000 polls into a single
-  origin read.
+- **Phones barely poll during a question.** Each phone already knows the question and its exact
+  end time, and counts down locally — so it sleeps through the countdown and only polls briskly
+  across transitions. This cuts polls per delegate from ~1,200 to ~499 over the session.
 - **Rank is computed on the phone, not the server.** The cached state payload carries a sorted
   array of every score (~2 KB gzipped). Each phone binary-searches its own score to find its
   rank — so 1,000 personalised ranks cost zero extra requests.
@@ -160,6 +160,12 @@ laptop with no network.
 | [DATA-PRIVACY.md](docs/DATA-PRIVACY.md) | What is collected, consent, retention, deletion |
 
 ---
+
+> **Cost note:** measured edge-cache collapse on the live deploy was lower than designed
+> (~1.6×, not ~1,000×). With adaptive polling this lands around 312k function invocations for
+> the event — over Netlify's 125k free tier. Budget **Netlify Pro (~USD 19 for October)** unless
+> a re-measure after the cache fix shows otherwise. Detail in
+> [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## ⚠️ Two things to action before event day
 

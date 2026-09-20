@@ -22,26 +22,67 @@ export async function postJson(path, payload, { token } = {}) {
 }
 
 /**
- * Poll /api/state on an interval, with two deliberate behaviours:
+ * How long to wait before the next state poll, given what we just learned.
  *
- *  · Jitter. Without it, 1,000 phones that loaded the page together would
- *    poll in lockstep forever, turning a smooth ~1,000 req/s into spikes.
- *    ±250 ms of noise spreads them out.
+ * This is the main defence against 1,000 phones generating 1,000 requests a
+ * second. Measured on the live deploy, CDN edge collapse was only ~1.6x — far
+ * below what a "1 second TTL" naively implies — so the client must not lean on
+ * caching alone to keep origin load sane.
+ *
+ * The key insight: during a live question the phone already knows everything
+ * it needs. It has the question text and the exact end time, and it counts
+ * down locally against the server-corrected clock. It does not need to poll
+ * through the countdown at all — only to be awake near the transition.
+ */
+export function nextDelay(state, { serverNow = Date.now() } = {}) {
+  if (!state?.phase) return 2000
+
+  if (state.phase === 'question' && state.questionStartedAt && state.durationMs) {
+    const remaining = state.questionStartedAt + state.durationMs - serverNow
+    // Plenty of time left: sleep until ~3s before the timer expires, so we are
+    // awake and polling fast when the host locks. Capped so a client that
+    // joins mid-question is never asleep for long.
+    if (remaining > 4000) return Math.min(remaining - 3000, 8000)
+    // Transition imminent — poll briskly so "time's up" lands promptly.
+    return 1200
+  }
+
+  // The host controls these transitions, so we cannot predict them; poll often
+  // enough to feel responsive without being wasteful.
+  if (state.phase === 'locked') return 1200
+  if (state.phase === 'draw') return 2000
+  return 2500
+}
+
+/**
+ * Poll /api/state, with three deliberate behaviours:
+ *
+ *  · Adaptive interval (see nextDelay) — the single biggest reduction in
+ *    origin load, and the reason this design survives 1,000 concurrent phones.
+ *
+ *  · Jitter. Without it, 1,000 phones that loaded the page together would poll
+ *    in lockstep forever, turning steady load into spikes. ±12% of noise
+ *    spreads them out.
  *
  *  · Backoff on failure. If the network wobbles, clients slow down instead of
- *    hammering a struggling origin — then snap back to normal on recovery.
+ *    hammering a struggling origin — then snap back on recovery.
+ *
+ * `interval` forces a fixed cadence instead, for the big screen and host
+ * console: those are two operator devices, so their load is irrelevant and
+ * responsiveness matters more.
  */
-export function pollState(onState, { interval = 1000, onError } = {}) {
+export function pollState(onState, { interval = null, onError } = {}) {
   let stopped = false
   let failures = 0
   let timer
 
   async function tick() {
     if (stopped) return
+    let state = null
     try {
       const res = await fetch('/api/state', { credentials: 'omit' })
       if (!res.ok) throw new Error(`state ${res.status}`)
-      const state = await res.json()
+      state = await res.json()
       failures = 0
       onState(state)
     } catch (err) {
@@ -49,9 +90,11 @@ export function pollState(onState, { interval = 1000, onError } = {}) {
       onError?.(err, failures)
     }
     if (stopped) return
-    const backoff = Math.min(failures, 4) * 1000
-    const jitter = (Math.random() - 0.5) * 500
-    timer = setTimeout(tick, interval + backoff + jitter)
+
+    const base = interval ?? nextDelay(state, { serverNow: state?.serverNow ?? Date.now() })
+    const backoff = Math.min(failures, 4) * 1500
+    const jitter = base * (Math.random() - 0.5) * 0.24
+    timer = setTimeout(tick, Math.max(600, base + backoff + jitter))
   }
 
   tick()

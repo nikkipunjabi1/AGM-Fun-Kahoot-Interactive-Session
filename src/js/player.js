@@ -411,7 +411,7 @@ if (me) {
 }
 
 pollState(onState, {
-  interval: 1000,
+  // No fixed interval: the phone polls adaptively (see lib/api.js nextDelay).
   onError: (_err, failures) => {
     if (failures >= 3) setConnection('down', 'Offline — retrying')
     else setConnection('warn', 'Reconnecting')
