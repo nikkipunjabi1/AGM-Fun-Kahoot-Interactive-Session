@@ -89,3 +89,29 @@ leaderboard.
 one connection. It proves the backend holds. It cannot prove the venue Wi-Fi holds, which is
 the likelier failure on the day — that needs the venue AV conversation in
 [OPERATIONS.md](OPERATIONS.md#venue-network).
+
+---
+
+## BL-06 — Answer key is skewed toward B  🟡 decision needed
+
+**Found by:** `npm run check`, 20 Sep 2026
+
+Across the 30 questions the correct answer is distributed:
+
+| A | B | C | D |
+|---|---|---|---|
+| 5 | **12** | 9 | 4 |
+
+B is correct 40% of the time. A delegate who simply taps B on every question scores around 40%
+without reading anything — which on a 1,000-player leaderboard is enough to place respectably.
+
+**Options:**
+
+1. **Leave it.** It is the Chapter's approved question pack, and the printed answer key matches.
+2. **Rotate the option order** on a handful of questions so the correct letter moves, keeping
+   every question and option *word for word* identical. This changes the printed key, so the
+   host would need the updated one. Roughly a 15-minute change plus a re-check.
+3. **Randomise option order per question at build time**, with the key regenerated
+   automatically. Most robust, but the host's printed key must then come from the build.
+
+No change made — this is the Chapter's content, so the call is yours.

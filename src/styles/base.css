@@ -20,6 +20,11 @@ button { font: inherit; color: inherit; }
 
 img, svg { max-width: 100%; display: block; }
 
+/* An author-set `display` beats the UA stylesheet's [hidden] rule, so any
+   element we style with display:grid/flex would ignore the hidden attribute.
+   This keeps `hidden` meaning hidden everywhere. */
+[hidden] { display: none !important; }
+
 /* Visible focus for keyboard users, everywhere. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 3px solid var(--pmi-cyan);

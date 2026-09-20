@@ -36,6 +36,14 @@ const SCORES = Array.from({ length: 1000 }, (_, i) => Math.max(0, 28000 - i * 27
 let phase = 'lobby'
 let questionIndex = 0
 let startedAt = Date.now()
+let mockPlayerSeq = 0
+const mockAnswered = new Set()
+
+async function readBody(req) {
+  const chunks = []
+  for await (const chunk of req) chunks.push(chunk)
+  try { return JSON.parse(Buffer.concat(chunks).toString() || '{}') } catch { return {} }
+}
 
 function state() {
   const base = {
@@ -117,7 +125,31 @@ createServer(async (req, res) => {
     return res.end(JSON.stringify(state()))
   }
 
-  // Everything privileged is stubbed out — this server is for layout only.
+  // Minimal join/answer so scripts/loadtest.js can be smoke-tested against
+  // the mock before it is ever pointed at the real deploy. Duplicate answers
+  // are rejected here too, so the harness's duplicate detection is exercised.
+  if (url.pathname === '/api/join' && req.method === 'POST') {
+    const id = `mock-${(mockPlayerSeq++).toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    return res.end(JSON.stringify({ ok: true, playerId: id, firstName: 'Mock', sessionCode: 'MOCK' }))
+  }
+
+  if (url.pathname === '/api/answer' && req.method === 'POST') {
+    const body = await readBody(req)
+    const key = `${body.playerId}:${body.questionIndex}`
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    if (mockAnswered.has(key)) {
+      return res.end(JSON.stringify({ ok: false, error: 'Already answered', code: 'DUPLICATE' }))
+    }
+    mockAnswered.add(key)
+    return res.end(JSON.stringify({
+      ok: true, accepted: true, isCorrect: body.choice === 'C',
+      points: body.choice === 'C' ? 800 : 0, elapsedMs: 4000,
+      totalScore: 800, correctCount: 1, answered: 1,
+    }))
+  }
+
+  // Everything else privileged is stubbed out — this server is layout only.
   if (url.pathname.startsWith('/api/')) {
     res.writeHead(200, { 'Content-Type': 'application/json' })
     return res.end(JSON.stringify({ ok: true, mock: true }))
