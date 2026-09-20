@@ -38,18 +38,43 @@ requests from memory without touching our function.
 Cache-Control: public, max-age=1, stale-while-revalidate=4
 ```
 
-The critical insight: **all 1,000 delegates are in one room**, so they resolve to the same
-Netlify edge PoP. That PoP fetches from origin at most once per second and fans the answer out
-to everyone else.
-
-```
-1,000 phones × 1 poll/sec  =  1,000 requests/sec at the edge
-                           =  ~1 request/sec at our function
-                           =  ~1 query/sec at Postgres
-```
-
 There is no connection state anywhere, so there is nothing to exhaust, nothing to reconnect,
 and a phone that locks its screen or drops off Wi-Fi simply resumes on its next poll.
+
+### ⚠ Measured reality: do not rely on edge caching alone
+
+An earlier version of this document claimed the 1-second edge cache would collapse ~1,000
+requests/sec into ~1 origin request/sec. **Measurement on the live Netlify deploy did not
+support that.** Sustained concurrent polling collapsed only ~1.6×, with
+`cache-status: "Netlify Durable"; fwd=bypass` — the shared durable cache was not being used, so
+each edge worker kept its own short-lived copy.
+
+Two changes followed:
+
+1. **One source of truth for cache headers.** `Netlify-CDN-Cache-Control` was declared both in
+   `netlify.toml` and inside the function. Conflicting declarations are the likeliest cause of
+   the durable-cache bypass, so the `netlify.toml` block was removed and the edge TTL raised
+   to 2s.
+
+2. **Adaptive client polling**, which is now the primary defence rather than the cache. During
+   a live question the phone already has the question text and the exact end time, and counts
+   down locally — so it does not poll through the countdown at all. It sleeps until ~3s before
+   the timer expires, then polls briskly across the transition. See `nextDelay()` in
+   [`src/js/lib/api.js`](../src/js/lib/api.js).
+
+Measured effect over a full 30-question session:
+
+| | Polls per delegate | At 1,000 players, 1.6× collapse |
+|---|---|---|
+| Fixed 1s polling | 1,200 | ~750,000 invocations |
+| Adaptive polling | 499 | ~312,000 invocations |
+| Adaptive + working durable cache (10×) | 499 | ~50,000 invocations |
+
+Netlify's free tier allows 125,000 function invocations/month. **If the durable cache fix does
+not land, this event needs Netlify Pro** (2M invocations, ~USD 19 for the month). That is the
+honest budget position: treat Pro as cheap insurance rather than assuming free tier.
+
+Re-measure after any deploy with `scripts/measure-cache.js`.
 
 **Trade-off, stated plainly:** question transitions land within ~1 second rather than ~150 ms.
 For a room watching a projector, that is imperceptible — and it buys immunity from the failure
