@@ -1,0 +1,218 @@
+/* ==========================================================================
+   Big screen — projected to a 1,000-seat hall.
+
+   Type is sized for readability at roughly 40 m. Everything is proportional
+   to viewport units so the same page works on a 16:9 projector, an ultrawide
+   LED wall, or a laptop during rehearsal without reconfiguration.
+   ========================================================================== */
+
+body { background: var(--pmi-purple-deep); overflow: hidden; }
+
+.stage {
+  position: relative;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  color: #fff;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%,  rgba(79, 23, 168, .85), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 90% 100%, rgba(5, 191, 224, .22), transparent 60%),
+    linear-gradient(160deg, var(--pmi-purple-deep) 0%, #1C0740 100%);
+}
+
+/* --- Header -------------------------------------------------------------- */
+.stage-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 2rem; padding: 1.6vh 2.5vw;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+.stage-logo { width: clamp(180px, 15vw, 320px); height: auto; }
+.stage-meta { text-align: right; display: grid; gap: .25rem; }
+.theme-line { font-size: clamp(.75rem, 1vw, 1.05rem); color: rgba(255,255,255,.66); letter-spacing: .04em; }
+.progress { font-size: clamp(.7rem, .85vw, .95rem); color: var(--pmi-cyan); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+
+/* --- Scenes -------------------------------------------------------------- */
+.stage-main { position: relative; overflow: hidden; }
+.scene { display: none; height: 100%; padding: 3vh 3.5vw; animation: riseIn .4s var(--ease); }
+.scene[data-active="true"] { display: block; }
+.scene-center[data-active="true"] { display: grid; place-items: center; text-align: center; }
+
+.kicker {
+  font-size: clamp(.9rem, 1.3vw, 1.4rem); font-weight: 800;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--pmi-orange);
+}
+
+/* --- Lobby --------------------------------------------------------------- */
+.lobby { display: grid; grid-template-columns: 1.1fr .9fr; gap: 5vw; align-items: center; height: 100%; }
+.lobby-title { font-size: clamp(2.6rem, 6vw, 6rem); font-weight: 800; line-height: 1.02; margin: .3em 0 .5em; }
+
+.lobby-steps { list-style: none; padding: 0; margin: 0 0 4vh; display: grid; gap: 1.6vh; }
+.lobby-steps li {
+  display: flex; align-items: center; gap: 1rem;
+  font-size: clamp(1rem, 1.7vw, 1.85rem); color: rgba(255,255,255,.9);
+}
+.lobby-steps span {
+  flex: none; width: 2.1em; height: 2.1em; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255,255,255,.12); border: 2px solid var(--pmi-cyan);
+  color: var(--pmi-cyan); font-weight: 800; font-size: .72em;
+}
+
+.lobby-url {
+  display: inline-block; padding: .5em .9em; border-radius: var(--r-md);
+  background: rgba(255,255,255,.1); border: 2px dashed rgba(255,255,255,.3);
+  font-size: clamp(1.1rem, 2.1vw, 2.3rem); font-weight: 800; letter-spacing: .01em;
+  word-break: break-all;
+}
+.lobby-hint { margin-top: 1.6vh; font-size: clamp(.85rem, 1.1vw, 1.2rem); color: rgba(255,255,255,.6); }
+
+.lobby-right { display: grid; justify-items: center; gap: 2.5vh; }
+.qr-frame { background: #fff; padding: clamp(12px, 1.6vw, 28px); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); }
+/* The QR is rendered as a table of cells by qrcode-generator. */
+#qr table { border-collapse: collapse; }
+#qr td { width: clamp(4px, .62vw, 11px); height: clamp(4px, .62vw, 11px); }
+#qr img, #qr canvas { width: clamp(220px, 26vw, 460px); height: auto; image-rendering: pixelated; }
+
+.joined { text-align: center; }
+.joined strong {
+  display: block; font-size: clamp(3rem, 7vw, 7rem); font-weight: 800; line-height: 1;
+  color: var(--pmi-cyan); font-variant-numeric: tabular-nums;
+}
+.joined span { font-size: clamp(.85rem, 1.2vw, 1.3rem); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+
+/* --- Round intro --------------------------------------------------------- */
+.round-title { font-size: clamp(3rem, 8vw, 8rem); font-weight: 800; line-height: 1.02; margin: .2em 0; }
+.round-sub { font-size: clamp(1rem, 2vw, 2.1rem); color: rgba(255,255,255,.72); }
+
+/* --- Question ------------------------------------------------------------ */
+#scene-question[data-active="true"] { display: grid; grid-template-rows: auto auto 1fr auto; gap: 2.4vh; }
+
+.q-top { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+.q-badge {
+  padding: .45em 1.1em; border-radius: var(--r-full);
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  font-size: clamp(.8rem, 1.2vw, 1.3rem); font-weight: 700; letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ring { position: relative; width: clamp(88px, 9vw, 150px); aspect-ratio: 1; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 9; }
+.ring-track { stroke: rgba(255,255,255,.14); }
+.ring-fill {
+  stroke: var(--pmi-cyan); stroke-linecap: round;
+  stroke-dasharray: 326.7; stroke-dashoffset: 0;
+  transition: stroke-dashoffset .95s linear, stroke .3s;
+}
+.ring[data-urgent="true"] .ring-fill { stroke: var(--pmi-orange); }
+.ring[data-urgent="true"] .ring-num { color: var(--pmi-orange); animation: pulse .9s infinite; }
+.ring-num {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: clamp(2rem, 3.6vw, 3.8rem); font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.q-display {
+  font-size: clamp(1.7rem, 3.9vw, 4.2rem); font-weight: 800; line-height: 1.16;
+  text-align: center; text-wrap: balance;
+}
+
+.s-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6vh 1.6vw; }
+.s-tile {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 1.2rem;
+  padding: 1.6vh 1.8vw; border-radius: var(--r-lg);
+  background: var(--tile); color: #fff;
+  font-size: clamp(1rem, 2.1vw, 2.2rem); font-weight: 700;
+  transition: opacity .35s, transform .35s var(--ease), filter .35s;
+}
+.s-tile .shape { flex: none; font-size: clamp(1rem, 1.9vw, 2rem); color: rgba(255,255,255,.92); }
+.s-tile-text { position: relative; z-index: 1; line-height: 1.25; }
+
+/* Distribution bar, filled in at reveal. */
+.s-tile-bar { position: absolute; inset: auto 0 0 0; height: 6px; background: rgba(0,0,0,.25); }
+.s-tile-bar i { display: block; height: 100%; width: 0; background: #fff; transition: width .8s var(--ease); }
+
+/* Reveal: the wrong answers step back, the right one steps forward. */
+.s-tiles[data-reveal="true"] .s-tile { opacity: .28; filter: saturate(.35); }
+.s-tiles[data-reveal="true"] .s-tile[data-correct="true"] {
+  opacity: 1; filter: none; transform: scale(1.03);
+  box-shadow: 0 0 0 5px #fff, 0 0 44px rgba(255,255,255,.4);
+}
+.s-tile[data-correct="true"]::after {
+  content: "✓"; margin-left: auto; font-size: 1.4em; font-weight: 800; position: relative; z-index: 1;
+}
+.s-tile-count {
+  margin-left: auto; font-variant-numeric: tabular-nums; opacity: .92;
+  font-size: .8em; position: relative; z-index: 1;
+}
+
+.answered-line { text-align: center; font-size: clamp(.9rem, 1.4vw, 1.5rem); color: rgba(255,255,255,.72); }
+.answered-line strong { color: var(--pmi-cyan); font-variant-numeric: tabular-nums; }
+
+/* --- Leaderboard --------------------------------------------------------- */
+#scene-board[data-active="true"] { display: grid; grid-template-rows: auto 1fr auto; gap: 2.4vh; }
+.board-title { font-size: clamp(2rem, 4.4vw, 4.6rem); font-weight: 800; text-align: center; }
+
+/* grid-auto-rows: 1fr makes the ten rows share the available height exactly,
+   so the board fits any projector aspect without clipping 9th and 10th place. */
+.board {
+  list-style: none; padding: 0; margin: 0; display: grid; gap: .8vh;
+  grid-auto-rows: minmax(0, 1fr); align-content: stretch; min-height: 0;
+}
+.board li {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.4rem;
+  min-height: 0; padding: 0 1.8vw; border-radius: var(--r-md);
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
+  font-size: clamp(.95rem, 1.7vw, 1.9rem); font-weight: 700;
+  animation: riseIn .4s var(--ease) backwards;
+}
+.board li:nth-child(1) { background: linear-gradient(90deg, rgba(255,97,15,.35), rgba(255,97,15,.08)); border-color: var(--pmi-orange); }
+.board li:nth-child(2) { background: linear-gradient(90deg, rgba(5,191,224,.28), rgba(5,191,224,.06)); border-color: rgba(5,191,224,.55); }
+.board li:nth-child(3) { background: linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04)); }
+.board .pos {
+  width: 2em; height: 2em; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255,255,255,.14); font-size: .8em; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.board .score { font-variant-numeric: tabular-nums; color: var(--pmi-cyan); }
+.board-foot { text-align: center; font-size: clamp(.85rem, 1.2vw, 1.3rem); color: rgba(255,255,255,.66); }
+
+/* --- Draw ---------------------------------------------------------------- */
+.draw-stage { width: min(1100px, 88vw); }
+.spinner { margin: 3vh 0; }
+.spinner-label { font-size: clamp(.9rem, 1.3vw, 1.4rem); color: rgba(255,255,255,.7); letter-spacing: .1em; text-transform: uppercase; }
+.spinner-name {
+  margin-top: 1.5vh; padding: .5em 1em; border-radius: var(--r-lg);
+  background: rgba(255,255,255,.1); border: 3px solid var(--pmi-cyan);
+  font-size: clamp(2rem, 5.5vw, 5rem); font-weight: 800; letter-spacing: .02em;
+}
+
+.winners { list-style: none; padding: 0; margin: 3vh 0 0; display: grid; gap: 1.4vh; }
+.winners li {
+  display: flex; align-items: center; justify-content: center; gap: 1.2rem;
+  padding: 1.4vh 2vw; border-radius: var(--r-lg);
+  background: linear-gradient(90deg, rgba(255,97,15,.3), rgba(79,23,168,.3));
+  border: 2px solid var(--pmi-orange);
+  font-size: clamp(1.3rem, 3.2vw, 3.2rem); font-weight: 800;
+  animation: pop .5s var(--ease) backwards;
+}
+.winners .pos {
+  width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center;
+  background: var(--pmi-orange); font-size: .6em; flex: none;
+}
+.draw-foot { margin-top: 2.5vh; font-size: clamp(.85rem, 1.2vw, 1.3rem); color: rgba(255,255,255,.6); }
+
+/* --- Confetti and errors ------------------------------------------------- */
+.confetti { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; }
+
+.screen-error {
+  position: absolute; left: 50%; bottom: 2vh; transform: translateX(-50%);
+  padding: .6em 1.2em; border-radius: var(--r-full);
+  background: rgba(217,45,32,.92); font-size: 1rem; font-weight: 700;
+}
+
+/* --- Portrait or very narrow: stack the lobby --------------------------- */
+@media (max-aspect-ratio: 1/1) {
+  .lobby { grid-template-columns: 1fr; gap: 3vh; }
+  .lobby-steps { display: none; }
+}
