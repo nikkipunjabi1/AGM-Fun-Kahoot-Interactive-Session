@@ -3,9 +3,130 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PMI UAE AGM 2026</title>
+  <meta name="theme-color" content="#2E0D63">
+  <meta name="robots" content="noindex">
+  <title>PMI UAE AGM 2026 — Main Screen</title>
+  <link rel="icon" href="/logos/pmi-uae-mark-white.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/screen.css">
 </head>
-<body>
-  <p>Placeholder — the screen surface lands on feature/host-and-screen.</p>
+<body class="screen-root">
+
+<div class="stage" id="stage">
+
+  <!-- Dark background → white logo, per docs/BRANDING.md -->
+  <header class="stage-header">
+    <img src="/logos/pmi-uae-horizontal-white.svg" alt="PMI UAE Chapter" class="stage-logo">
+    <div class="stage-meta">
+      <span class="theme-line">Growing in Unity · Leading Projects · Shaping Future</span>
+      <span class="progress" id="progress"></span>
+    </div>
+  </header>
+
+  <main class="stage-main">
+
+    <!-- ================= LOBBY ================= -->
+    <section class="scene" id="scene-lobby" data-active="true">
+      <div class="lobby">
+        <div class="lobby-left">
+          <p class="kicker">Annual Gathering 2026</p>
+          <h1 class="lobby-title">Join the quiz</h1>
+          <ol class="lobby-steps">
+            <li><span>1</span>Scan the code with your phone camera</li>
+            <li><span>2</span>Enter your name and email</li>
+            <li><span>3</span>Answer fast — speed scores more</li>
+          </ol>
+          <p class="lobby-url" id="join-url">—</p>
+          <p class="lobby-hint">Wi-Fi slow? Switch to mobile data.</p>
+        </div>
+        <div class="lobby-right">
+          <div class="qr-frame"><div id="qr"></div></div>
+          <div class="joined">
+            <strong id="joined-count">0</strong>
+            <span>players joined</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ROUND INTRO ================= -->
+    <section class="scene scene-center" id="scene-round">
+      <div class="round-card">
+        <p class="kicker" id="round-kicker">Round 1</p>
+        <h1 class="round-title" id="round-title">UAE Mega Projects</h1>
+        <p class="round-sub" id="round-sub">—</p>
+      </div>
+    </section>
+
+    <!-- ================= QUESTION ================= -->
+    <section class="scene" id="scene-question">
+      <div class="q-top">
+        <span class="q-badge" id="s-round">Round 1</span>
+        <div class="ring" id="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <span class="ring-num" id="ring-num">15</span>
+        </div>
+        <span class="q-badge" id="s-count">1 / 30</span>
+      </div>
+
+      <h1 class="q-display" id="s-text">—</h1>
+
+      <div class="s-tiles" id="s-tiles">
+        <div class="s-tile tile-a" data-choice="A">
+          <span class="shape shape-triangle" aria-hidden="true"></span>
+          <span class="s-tile-text" id="s-opt-A">—</span>
+          <span class="s-tile-bar"><i></i></span>
+        </div>
+        <div class="s-tile tile-b" data-choice="B">
+          <span class="shape shape-diamond" aria-hidden="true"></span>
+          <span class="s-tile-text" id="s-opt-B">—</span>
+          <span class="s-tile-bar"><i></i></span>
+        </div>
+        <div class="s-tile tile-c" data-choice="C">
+          <span class="shape shape-circle" aria-hidden="true"></span>
+          <span class="s-tile-text" id="s-opt-C">—</span>
+          <span class="s-tile-bar"><i></i></span>
+        </div>
+        <div class="s-tile tile-d" data-choice="D">
+          <span class="shape shape-square" aria-hidden="true"></span>
+          <span class="s-tile-text" id="s-opt-D">—</span>
+          <span class="s-tile-bar"><i></i></span>
+        </div>
+      </div>
+
+      <p class="answered-line" id="answered-line"><strong>0</strong> answered</p>
+    </section>
+
+    <!-- ================= LEADERBOARD / FINAL ================= -->
+    <section class="scene" id="scene-board">
+      <h1 class="board-title" id="board-title">Leaderboard</h1>
+      <ol class="board" id="board"></ol>
+      <p class="board-foot" id="board-foot"></p>
+    </section>
+
+    <!-- ================= DRAW ================= -->
+    <section class="scene scene-center" id="scene-draw">
+      <div class="draw-stage">
+        <p class="kicker">🎁 Goodie winners</p>
+        <div class="spinner" id="spinner" hidden>
+          <p class="spinner-label">Drawing tied places…</p>
+          <div class="spinner-name" id="spinner-name">—</div>
+        </div>
+        <ol class="winners" id="winners"></ol>
+        <p class="draw-foot" id="draw-foot"></p>
+      </div>
+    </section>
+
+  </main>
+
+  <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+  <p class="screen-error" id="screen-error" hidden></p>
+</div>
+
+<script type="module" src="./js/screen.js"></script>
 </body>
 </html>
