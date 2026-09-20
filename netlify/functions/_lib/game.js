@@ -59,6 +59,16 @@ export async function buildState(session) {
     .eq('session_id', session.id)
   state.playerCount = count ?? 0
 
+  // --- round intro ---------------------------------------------------------
+  // Deliberately carries the round title only, never the question text — the
+  // intro card goes up before the question is revealed.
+  if (session.phase === 'round' && session.question_index >= 0) {
+    const meta = publicQuestion(session.question_index)
+    state.roundIntro = meta
+      ? { round: meta.round, title: meta.roundTitle, subtitle: meta.roundSubtitle, questions: meta.roundTotal }
+      : null
+  }
+
   // --- the question itself -------------------------------------------------
   if (QUESTION_PHASES.has(session.phase) && session.question_index >= 0) {
     state.question = publicQuestion(session.question_index)
