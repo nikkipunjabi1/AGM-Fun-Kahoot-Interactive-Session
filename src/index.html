@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#4F17A8">
+  <meta name="description" content="PMI UAE Chapter Annual Gathering 2026 — live interactive quiz.">
+  <meta name="robots" content="noindex">
+  <title>PMI UAE AGM 2026 — Quiz</title>
+  <link rel="icon" href="/logos/pmi-uae-mark-color.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/logos/pmi-uae-mark-color.svg">
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/player.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Light background → full-colour logo, per docs/BRANDING.md -->
+  <header class="app-header">
+    <img src="/logos/pmi-uae-horizontal-color.svg" alt="PMI UAE Chapter" class="app-logo" width="200" height="72">
+    <div class="app-status" id="connection" data-state="ok" role="status" aria-live="polite">
+      <span class="dot"></span><span class="label">Connected</span>
+    </div>
+  </header>
+
+  <main class="app-main" id="main">
+
+    <!-- ================= JOIN ================= -->
+    <section class="view" id="view-join" data-active="true">
+      <div class="join-hero">
+        <p class="eyebrow">Annual Gathering 2026</p>
+        <h1 class="join-title">Growing&nbsp;in&nbsp;Unity<br><span>Leading Projects · Shaping Future</span></h1>
+        <p class="join-sub">30 questions · 3 rounds · goodies for the top&nbsp;finishers</p>
+      </div>
+
+      <form id="join-form" class="join-form" novalidate>
+        <div class="field">
+          <label for="firstName">First name</label>
+          <input id="firstName" name="firstName" type="text" autocomplete="given-name"
+                 enterkeyhint="next" required maxlength="40" spellcheck="false">
+          <p class="field-error" id="err-firstName" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="lastName">Last name</label>
+          <input id="lastName" name="lastName" type="text" autocomplete="family-name"
+                 enterkeyhint="next" required maxlength="40" spellcheck="false">
+          <p class="field-error" id="err-lastName" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" inputmode="email"
+                 enterkeyhint="next" required maxlength="120" spellcheck="false" autocapitalize="off">
+          <p class="hint">So we can reach you if you win. Never shown on screen.</p>
+          <p class="field-error" id="err-email" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="phone">Mobile <span class="optional">— optional</span></label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"
+                 enterkeyhint="done" placeholder="+971 50 123 4567" maxlength="20">
+          <p class="field-error" id="err-phone" aria-live="polite"></p>
+        </div>
+
+        <label class="checkbox" id="consent-wrap">
+          <input type="checkbox" id="consent" name="consent" required>
+          <span>I agree that PMI UAE Chapter may contact me about this quiz and my prize.</span>
+        </label>
+        <p class="field-error" id="err-consent" aria-live="polite"></p>
+
+        <button type="submit" class="btn btn-primary btn-block btn-join" id="join-btn">
+          Join the quiz
+        </button>
+        <p class="form-error" id="join-error" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- ================= WAITING ================= -->
+    <section class="view view-center" id="view-waiting">
+      <div class="waiting-card">
+        <div class="tick" aria-hidden="true">✓</div>
+        <h2 id="waiting-name">You're in!</h2>
+        <p class="waiting-copy" id="waiting-copy">Keep this page open. The first question will appear here.</p>
+        <div class="waiting-meta">
+          <div><strong id="waiting-count">—</strong><span>players joined</span></div>
+        </div>
+        <div class="pulse-bar" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <!-- ================= QUESTION ================= -->
+    <section class="view" id="view-question">
+      <div class="q-head">
+        <div class="q-meta">
+          <span class="q-round" id="q-round">Round 1</span>
+          <span class="q-count" id="q-count">Question 1 of 30</span>
+        </div>
+        <div class="timer" id="timer" role="timer" aria-live="off">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <circle class="timer-track" cx="22" cy="22" r="19"></circle>
+            <circle class="timer-fill" id="timer-fill" cx="22" cy="22" r="19"></circle>
+          </svg>
+          <span class="timer-num" id="timer-num">15</span>
+        </div>
+      </div>
+
+      <p class="q-text" id="q-text">—</p>
+
+      <div class="tiles" id="tiles" role="group" aria-label="Answer options">
+        <button class="tile tile-a" data-choice="A" type="button">
+          <span class="shape shape-triangle" aria-hidden="true"></span>
+          <span class="tile-letter" aria-hidden="true">A</span>
+          <span class="tile-text" id="opt-A">—</span>
+        </button>
+        <button class="tile tile-b" data-choice="B" type="button">
+          <span class="shape shape-diamond" aria-hidden="true"></span>
+          <span class="tile-letter" aria-hidden="true">B</span>
+          <span class="tile-text" id="opt-B">—</span>
+        </button>
+        <button class="tile tile-c" data-choice="C" type="button">
+          <span class="shape shape-circle" aria-hidden="true"></span>
+          <span class="tile-letter" aria-hidden="true">C</span>
+          <span class="tile-text" id="opt-C">—</span>
+        </button>
+        <button class="tile tile-d" data-choice="D" type="button">
+          <span class="shape shape-square" aria-hidden="true"></span>
+          <span class="tile-letter" aria-hidden="true">D</span>
+          <span class="tile-text" id="opt-D">—</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= ANSWER LOCKED ================= -->
+    <section class="view view-center" id="view-locked">
+      <div class="locked-card">
+        <div class="locked-choice" id="locked-choice" aria-hidden="true">A</div>
+        <h2>Answer locked in</h2>
+        <p id="locked-copy">Eyes on the main screen.</p>
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+    </section>
+
+    <!-- ================= RESULT ================= -->
+    <section class="view view-center" id="view-result">
+      <div class="result-card" id="result-card">
+        <div class="result-icon" id="result-icon" aria-hidden="true">✓</div>
+        <h2 class="result-title" id="result-title">Correct!</h2>
+        <p class="result-points" id="result-points">+1000</p>
+        <p class="result-sub" id="result-sub">Nicely done.</p>
+        <dl class="result-stats">
+          <div><dt>Score</dt><dd id="result-score">0</dd></div>
+          <div><dt>Correct</dt><dd id="result-correct">0</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ================= LEADERBOARD / FINAL ================= -->
+    <section class="view view-center" id="view-standing">
+      <div class="standing-card">
+        <p class="eyebrow" id="standing-eyebrow">Leaderboard</p>
+        <div class="rank-big"><span id="standing-rank">—</span></div>
+        <p class="standing-of">of <strong id="standing-total">—</strong> players</p>
+        <dl class="result-stats">
+          <div><dt>Score</dt><dd id="standing-score">0</dd></div>
+          <div><dt>Correct</dt><dd id="standing-correct">0</dd></div>
+        </dl>
+        <p class="standing-note" id="standing-note">Look up — the top 10 are on the big screen.</p>
+      </div>
+    </section>
+
+    <!-- ================= DRAW ================= -->
+    <section class="view view-center" id="view-draw">
+      <div class="draw-card">
+        <div class="gift" aria-hidden="true">🎁</div>
+        <h2 id="draw-title">Goodie winners</h2>
+        <ol class="draw-list" id="draw-list"></ol>
+        <p class="draw-note" id="draw-note">Watch the main screen.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <span id="footer-score" class="footer-score" hidden>Score <strong>0</strong></span>
+    <span class="footer-brand">PMI UAE Chapter</span>
+  </footer>
+</div>
+
+<script type="module" src="./js/player.js"></script>
+</body>
+</html>

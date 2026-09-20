@@ -18,7 +18,7 @@ create table if not exists public.sessions (
   status              text not null default 'open'
                         check (status in ('open', 'closed')),
   phase               text not null default 'lobby'
-                        check (phase in ('lobby','question','locked','reveal',
+                        check (phase in ('lobby','round','question','locked','reveal',
                                          'leaderboard','final','draw')),
   question_index      int  not null default -1,   -- -1 = not started
   question_started_at timestamptz,
