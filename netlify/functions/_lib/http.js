@@ -17,11 +17,15 @@ export function json(body, { status = 200, headers = {} } = {}) {
  * The response shape that makes 1,000 concurrent players affordable.
  *
  * `Netlify-CDN-Cache-Control` governs the edge; `Cache-Control` governs the
- * browser. We let the edge hold the payload for a second and serve stale for
- * four more while it revalidates, but tell the browser never to reuse it — so
- * each poll still reaches the edge and picks up phase changes promptly.
+ * browser. The edge holds the payload briefly and serves stale while it
+ * revalidates; the browser is told never to reuse it, so each poll still
+ * reaches the edge and picks up phase changes promptly.
+ *
+ * Measured on the live deploy: edge collapse is far lower than a naive
+ * reading of "1s TTL" suggests, so the client ALSO polls adaptively (see
+ * src/js/lib/api.js). Do not rely on this header alone to carry the load.
  */
-export function cachedJson(body, seconds = 1) {
+export function cachedJson(body, seconds = 2) {
   return json(body, {
     headers: {
       'Cache-Control': 'public, max-age=0, must-revalidate',
