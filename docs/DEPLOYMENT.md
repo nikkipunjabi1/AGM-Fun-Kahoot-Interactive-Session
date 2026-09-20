@@ -13,13 +13,32 @@ Roughly 25 minutes end to end. Two free accounts needed: Supabase and Netlify.
 2. Open **SQL Editor** → **New query**.
 3. Paste the entire contents of [`db/schema.sql`](../db/schema.sql) and **Run**.
    You should see `Success. No rows returned.`
-4. Go to **Project Settings → API** and copy two values:
-   - **Project URL** → `SUPABASE_URL`
-   - **`service_role` secret** → `SUPABASE_SERVICE_ROLE_KEY`
+4. Go to **Project Settings → API Keys** and copy two values:
+   - **Project URL** (under Settings → General, or Data API) → `SUPABASE_URL`
+   - **Secret key** → `SUPABASE_SECRET_KEY`
 
-> ⚠️ `service_role` bypasses Row Level Security. It belongs only in Netlify environment
-> variables. Never put it in client code, never commit it. The `anon` key is not used by this
-> app at all — every database call goes through a server-side function.
+### Which key, exactly
+
+Supabase replaced the old `anon` / `service_role` pair with a new scheme in 2025. On the
+**API Keys** page you will see:
+
+| What you see | Use it? | Why |
+|---|---|---|
+| **Publishable key** (`sb_publishable_…`) | ❌ **No** | Cannot bypass RLS. Every table in this schema denies anon outright, so every query would fail. |
+| **Secret key** (`sb_secret_…`) | ✅ **Yes** | The replacement for `service_role`. Maps to the same privileged database role. |
+| Legacy tab → `service_role` JWT | ✅ Also fine | Older projects only. Identical effect. |
+
+The Secret key is masked by default — **click the eye icon to reveal it** before copying.
+
+Verified against `@supabase/supabase-js` 2.116: the new `sb_secret_` format is passed through
+unchanged as both the `apikey` header and the bearer token, so no code change is needed.
+
+> ⚠️ The Secret key bypasses Row Level Security. It belongs only in Netlify environment
+> variables. Never put it in client code, never commit it. The publishable key is not used by
+> this app at all — every database call goes through a server-side function.
+>
+> `SUPABASE_SERVICE_ROLE_KEY` is still accepted as a fallback variable name, so existing
+> deployments keep working.
 
 ---
 
@@ -52,7 +71,7 @@ Keep it. Without it nobody can open `/host` or `/admin`, or advance the game.
 | Key | Value | Scope |
 |---|---|---|
 | `SUPABASE_URL` | from step 1 | All |
-| `SUPABASE_SERVICE_ROLE_KEY` | from step 1 | All |
+| `SUPABASE_SECRET_KEY` | from step 1 (`sb_secret_…`) | All |
 | `HOST_TOKEN` | from step 2 | All |
 | `GAME_CODE` | `AGM2026` | All |
 | `QUESTION_DURATION_SECONDS` | `15` | All |
