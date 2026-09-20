@@ -69,6 +69,9 @@ async function handle(action, body) {
       const target =
         action === 'goto' ? Number(body.questionIndex)
         : action === 'start' ? 0
+        // Parked on a round intro? 'next' starts THAT question rather than
+        // skipping the first question of the round entirely.
+        : session.phase === 'round' ? session.question_index
         : session.question_index + 1
 
       if (!Number.isInteger(target) || target < 0) return error('Invalid question index', 422)
@@ -84,6 +87,20 @@ async function handle(action, body) {
           question_index: target,
           question_started_at: new Date().toISOString(),
         }),
+      })
+    }
+
+    // ---- round intro card -------------------------------------------------
+    // Parks on the first question of a round WITHOUT starting its timer, so
+    // the host can introduce the round without eating answering time.
+    case 'roundIntro': {
+      const target = Number.isInteger(body.questionIndex)
+        ? body.questionIndex
+        : session.question_index + 1
+      if (target < 0 || target >= TOTAL_QUESTIONS) return error('Invalid question index', 422)
+      return noStoreJson({
+        ok: true,
+        session: await patch({ phase: 'round', question_index: target, question_started_at: null }),
       })
     }
 

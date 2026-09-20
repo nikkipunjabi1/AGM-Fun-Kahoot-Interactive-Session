@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4F17A8">
+  <meta name="robots" content="noindex">
+  <title>Host Console — PMI UAE AGM 2026</title>
+  <link rel="icon" href="/logos/pmi-uae-mark-color.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/console.css">
+</head>
+<body class="console-body">
+
+<!-- ================= TOKEN GATE ================= -->
+<div class="gate" id="gate">
+  <form class="gate-card" id="gate-form">
+    <img src="/logos/pmi-uae-horizontal-color.svg" alt="PMI UAE Chapter" class="gate-logo">
+    <h1>Host console</h1>
+    <p class="gate-sub">Enter the host token to take control of the session.</p>
+    <div class="field">
+      <label for="token">Host token</label>
+      <input id="token" type="text" autocomplete="off" spellcheck="false" required>
+      <p class="field-error" id="gate-error" role="alert"></p>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Unlock</button>
+  </form>
+</div>
+
+<!-- ================= CONSOLE ================= -->
+<div class="console" id="console" hidden>
+
+  <header class="console-header">
+    <img src="/logos/pmi-uae-horizontal-color.svg" alt="PMI UAE Chapter" class="console-logo">
+    <div class="console-tags">
+      <span class="tag" id="tag-phase">—</span>
+      <span class="tag tag-muted" id="tag-code">—</span>
+      <span class="tag tag-muted" id="tag-players">0 players</span>
+    </div>
+    <a class="btn btn-ghost btn-sm" id="link-screen" href="/screen" target="_blank" rel="noopener">Open screen ↗</a>
+  </header>
+
+  <main class="console-main">
+
+    <!-- --- Now showing --- -->
+    <section class="panel panel-now">
+      <p class="panel-label">Now showing</p>
+      <h2 class="now-title" id="now-title">No session</h2>
+      <p class="now-sub" id="now-sub">Create a session to begin.</p>
+
+      <div class="now-timer" id="now-timer" hidden>
+        <div class="now-timer-bar"><i id="now-timer-fill"></i></div>
+        <span id="now-timer-num">15</span>
+      </div>
+
+      <div class="now-answer" id="now-answer" hidden>
+        <span class="now-answer-label">Correct answer</span>
+        <strong id="now-answer-value">—</strong>
+      </div>
+
+      <dl class="now-stats">
+        <div><dt>Answered</dt><dd id="stat-answered">0</dd></div>
+        <div><dt>Players</dt><dd id="stat-players">0</dd></div>
+        <div><dt>Question</dt><dd id="stat-question">—</dd></div>
+      </dl>
+    </section>
+
+    <!-- --- Primary controls --- -->
+    <section class="panel">
+      <p class="panel-label">Run the session</p>
+
+      <div class="ctl-grid">
+        <button class="btn btn-primary ctl-big" data-action="create" id="btn-create">Create session</button>
+        <button class="btn btn-accent ctl-big" data-action="start" id="btn-start">Start quiz</button>
+      </div>
+
+      <div class="ctl-row">
+        <button class="btn btn-ghost" data-action="roundIntro">Round intro</button>
+        <button class="btn btn-ghost" data-action="lock">Lock answers</button>
+        <button class="btn btn-ghost" data-action="reveal">Reveal answer</button>
+        <button class="btn btn-ghost" data-action="leaderboard">Leaderboard</button>
+      </div>
+
+      <button class="btn btn-primary btn-block ctl-next" data-action="next" id="btn-next">
+        Next question →
+      </button>
+
+      <div class="ctl-row">
+        <button class="btn btn-ghost" data-action="lobby">Back to lobby</button>
+        <button class="btn btn-ghost" data-action="final">Final leaderboard</button>
+      </div>
+    </section>
+
+    <!-- --- The draw --- -->
+    <section class="panel panel-draw">
+      <p class="panel-label">🎁 Goodie draw</p>
+      <p class="panel-help">
+        Top finishers by score, tie-broken by cumulative answer time. A random draw runs only
+        where players are genuinely tied across the cut-off.
+      </p>
+      <div class="draw-controls">
+        <div class="field field-inline">
+          <label for="winner-count">Winners</label>
+          <input id="winner-count" type="number" min="3" max="10" value="5" inputmode="numeric">
+        </div>
+        <button class="btn btn-accent" data-action="draw" id="btn-draw">Run the draw</button>
+      </div>
+      <div class="draw-result" id="draw-result" hidden></div>
+    </section>
+
+    <!-- --- Jump --- -->
+    <section class="panel">
+      <p class="panel-label">Jump to a question</p>
+      <p class="panel-help">Use this only to recover time — it starts that question immediately.</p>
+      <div class="jump" id="jump"></div>
+    </section>
+
+    <!-- --- Danger --- -->
+    <section class="panel panel-danger">
+      <p class="panel-label">Reset</p>
+      <p class="panel-help">
+        Deletes every player and answer in this session. Run this after rehearsal so test
+        players never appear on the live leaderboard. This cannot be undone.
+      </p>
+      <button class="btn btn-danger" id="btn-reset">Reset session</button>
+    </section>
+
+  </main>
+
+  <p class="toast" id="toast" hidden></p>
+</div>
+
+<script type="module" src="./js/host.js"></script>
+</body>
+</html>

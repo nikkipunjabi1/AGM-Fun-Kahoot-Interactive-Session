@@ -1,0 +1,73 @@
+/* ==========================================================================
+   PMI UAE Chapter — design tokens
+
+   Every colour in the application resolves to a variable defined here.
+   Colours are sampled directly from the official PMI UAE Chapter logo SVGs,
+   not approximated. Re-skinning to the final AGM slide deck is a change to
+   this file alone — see docs/BRANDING.md.
+   ========================================================================== */
+
+:root {
+  /* --- Brand, straight from the logo ----------------------------------- */
+  --pmi-purple:       #4F17A8;
+  --pmi-cyan:         #05BFE0;
+  --pmi-orange:       #FF610F;
+
+  /* --- Derived from the brand purple ----------------------------------- */
+  --pmi-purple-deep:  #2E0D63;
+  --pmi-purple-mid:   #3C1186;
+  --pmi-purple-lift:  #6B2BD9;
+  --pmi-ink:          #14093A;
+  --pmi-cloud:        #F6F4FB;
+  --pmi-mist:         #E7E1F5;
+
+  /* --- Complement -------------------------------------------------------
+     Four answer tiles need four distinguishable colours and the three brand
+     colours cannot do that accessibly. Chosen to sit with the PMI palette. */
+  --pmi-green:        #00A878;
+
+  /* --- Answer tiles: colour + shape, so colour is never the only signal - */
+  --answer-a: var(--pmi-purple);
+  --answer-b: var(--pmi-cyan);
+  --answer-c: var(--pmi-orange);
+  --answer-d: var(--pmi-green);
+
+  /* --- Semantic --------------------------------------------------------- */
+  --correct:   #00A878;
+  --incorrect: #D92D20;
+  --warning:   #F79009;
+
+  /* --- Surfaces --------------------------------------------------------- */
+  --surface:        #FFFFFF;
+  --surface-sunken: var(--pmi-cloud);
+  --border:         #DFD8EE;
+  --text:           var(--pmi-ink);
+  --text-muted:     #6B6484;
+  --text-invert:    #FFFFFF;
+
+  /* --- Type ------------------------------------------------------------
+     System stack on purpose: a webfont download is a real risk of a blank
+     screen on saturated venue Wi-Fi. */
+  --font: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+
+  /* --- Scale ------------------------------------------------------------ */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 9, 58, .06), 0 2px 8px rgba(20, 9, 58, .06);
+  --shadow-md: 0 4px 12px rgba(20, 9, 58, .10), 0 12px 32px rgba(20, 9, 58, .10);
+  --shadow-lg: 0 12px 40px rgba(20, 9, 58, .18);
+
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* The big screen is always dark purple — it is projected, never themed. */
+.screen-root {
+  --surface: transparent;
+  --text: #FFFFFF;
+  --text-muted: rgba(255, 255, 255, .72);
+  --border: rgba(255, 255, 255, .18);
+}

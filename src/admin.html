@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4F17A8">
+  <meta name="robots" content="noindex">
+  <title>Stats &amp; Exports — PMI UAE AGM 2026</title>
+  <link rel="icon" href="/logos/pmi-uae-mark-color.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/console.css">
+</head>
+<body class="console-body">
+
+<div class="gate" id="gate">
+  <form class="gate-card" id="gate-form">
+    <img src="/logos/pmi-uae-horizontal-color.svg" alt="PMI UAE Chapter" class="gate-logo">
+    <h1>Stats &amp; exports</h1>
+    <p class="gate-sub">Enter the host token to view live session statistics.</p>
+    <div class="field">
+      <label for="token">Host token</label>
+      <input id="token" type="text" autocomplete="off" spellcheck="false" required>
+      <p class="field-error" id="gate-error" role="alert"></p>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Unlock</button>
+  </form>
+</div>
+
+<div class="console" id="console" hidden>
+
+  <header class="console-header">
+    <img src="/logos/pmi-uae-horizontal-color.svg" alt="PMI UAE Chapter" class="console-logo">
+    <div class="console-tags">
+      <span class="tag" id="tag-phase">—</span>
+      <span class="tag tag-muted" id="tag-code">—</span>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="/host" target="_blank" rel="noopener">Host console ↗</a>
+  </header>
+
+  <main class="console-main">
+
+    <!-- --- Health --- -->
+    <section class="panel" style="grid-column: 1 / -1">
+      <p class="panel-label">Session health</p>
+      <dl class="kpis">
+        <div class="kpi"><dt>Players joined</dt><dd id="k-players">0</dd></div>
+        <div class="kpi"><dt>Active players</dt><dd id="k-active">0</dd></div>
+        <div class="kpi"><dt>Submissions recorded</dt><dd id="k-answers">0</dd></div>
+        <div class="kpi" id="kpi-capture"><dt>Capture rate</dt><dd id="k-capture">—</dd></div>
+        <div class="kpi"><dt>Questions asked</dt><dd id="k-asked">0</dd></div>
+        <div class="kpi"><dt>Average score</dt><dd id="k-avg">0</dd></div>
+      </dl>
+      <p class="panel-help" style="margin:1rem 0 0" id="capture-note"></p>
+    </section>
+
+    <!-- --- Exports --- -->
+    <section class="panel">
+      <p class="panel-label">Exports</p>
+      <p class="panel-help">
+        CSV downloads. <strong>Answers</strong> is the full record — one row per submission.
+        These files contain delegate personal data; handle per <code>docs/DATA-PRIVACY.md</code>.
+      </p>
+      <div class="exports">
+        <button class="btn btn-primary" data-export="answers">Answers (all submissions)</button>
+        <button class="btn btn-ghost" data-export="players">Players &amp; standings</button>
+        <button class="btn btn-ghost" data-export="summary">Question summary</button>
+      </div>
+    </section>
+
+    <!-- --- Rounds --- -->
+    <section class="panel">
+      <p class="panel-label">By round</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Round</th><th class="num">Questions</th><th class="num">Responses</th><th class="num">Correct</th></tr></thead>
+          <tbody id="rounds"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- --- Winners --- -->
+    <section class="panel panel-draw" id="panel-draw" hidden>
+      <p class="panel-label">🎁 Goodie winners</p>
+      <div class="draw-result" id="draw-result"></div>
+    </section>
+
+    <!-- --- Questions --- -->
+    <section class="panel" style="grid-column: 1 / -1">
+      <p class="panel-label">Per-question performance</p>
+      <p class="panel-help">Rows shaded amber were answered correctly by fewer than 40% — useful for the post-event report.</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>#</th><th>R</th><th class="q">Question</th><th>Ans</th>
+              <th class="num">Responses</th><th class="num">Correct</th><th>Correct %</th>
+              <th class="num">Avg time</th><th class="num">Participation</th>
+            </tr>
+          </thead>
+          <tbody id="questions"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- --- Leaderboard --- -->
+    <section class="panel" style="grid-column: 1 / -1">
+      <p class="panel-label">Top 25</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th class="num">#</th><th>Player</th><th class="num">Score</th><th class="num">Correct</th><th class="num">Answered</th><th class="num">Total time</th></tr></thead>
+          <tbody id="leaderboard"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <p class="toast" id="toast" hidden></p>
+</div>
+
+<script type="module" src="./js/admin.js"></script>
+</body>
+</html>
