@@ -131,6 +131,18 @@ npm run dev              # http://localhost:8888
 Set up the database once, by pasting [`db/schema.sql`](db/schema.sql) into the Supabase SQL
 editor. Step-by-step: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
+### Other commands
+
+```bash
+npm run check                          # validate the question bank
+npm run build && node scripts/mock-server.js   # preview every phase, no Supabase needed
+node scripts/loadtest.js --url <site> --players 1000 --confirm   # see docs/LOAD-TESTING.md
+```
+
+`scripts/mock-server.js` serves the built app with a fake game state you drive from the URL
+(`/screen?phase=reveal`, `/screen?phase=draw`, …), so the UI can be checked in every phase on a
+laptop with no network.
+
 ---
 
 ## Documentation
@@ -144,6 +156,7 @@ editor. Step-by-step: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 | [LOAD-TESTING.md](docs/LOAD-TESTING.md) | How to simulate 1,000 players before the event |
 | [BRANDING.md](docs/BRANDING.md) | PMI colour tokens, logo variant rules, accessibility |
 | [BRANCHING.md](docs/BRANCHING.md) | Branch strategy and review gate before `main` |
+| [BACKLOG.md](docs/BACKLOG.md) | Deferred items, open decisions and pre-event actions |
 | [DATA-PRIVACY.md](docs/DATA-PRIVACY.md) | What is collected, consent, retention, deletion |
 
 ---
