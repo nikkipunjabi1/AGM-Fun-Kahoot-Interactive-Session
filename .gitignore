@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+.netlify/
+.vite/
+
+# Environment — NEVER commit real keys. This repo is public.
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+*.log
+
+# Exports produced on event day (may contain attendee PII)
+exports/
+*.csv
+!db/sample-export.csv
