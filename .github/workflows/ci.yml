@@ -1,0 +1,54 @@
+name: CI
+
+# Runs on every push to develop and on any PR into main — so the review gate
+# before the live event is never just a visual check.
+on:
+  push:
+    branches: [develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  verify:
+    name: Build and verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check the question bank
+        # Fails the build on a malformed question, a duplicate, or an answer
+        # key leaking into the client payload.
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Assert the answer key is not in the client bundle
+        # The single most important check here. If a correct answer ever ends
+        # up in JavaScript a delegate downloads, the quiz is broken — so this
+        # greps the built output for answer-key shapes.
+        run: |
+          set -euo pipefail
+          if grep -rIlE '"answer"[[:space:]]*:[[:space:]]*"[ABCD]"' dist/ ; then
+            echo "::error::Answer key found in the client bundle."
+            exit 1
+          fi
+          echo "OK — no answer key in dist/"
+
+      - name: Report bundle size
+        # The player bundle is downloaded by ~1,000 phones on venue Wi-Fi.
+        # Regressions here are worth noticing.
+        run: |
+          echo "### Built assets" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          find dist -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' \) \
+            -exec ls -lh {} \; | awk '{print $5"\t"$9}' | sort -k2 >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
