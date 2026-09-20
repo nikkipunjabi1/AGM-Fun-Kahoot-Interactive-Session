@@ -23,6 +23,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Scan for committed secrets
+        # A real HOST_TOKEN once reached this PUBLIC repo via .env.example.
+        # This makes that failure loud and automatic.
+        run: npm run check:secrets
+
       - name: Check the question bank
         # Fails the build on a malformed question, a duplicate, or an answer
         # key leaking into the client payload.
