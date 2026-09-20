@@ -2,7 +2,7 @@
   "name": "pmi-uae-agm-2026-quiz",
   "version": "1.0.0",
   "private": true,
-  "description": "PMI UAE Chapter Annual Gathering 2026 — live interactive quiz for ~1,000 delegates",
+  "description": "PMI UAE Chapter Annual Gathering 2026 \u2014 live interactive quiz for ~1,000 delegates",
   "type": "module",
   "engines": {
     "node": ">=22.13.0"
@@ -12,7 +12,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "loadtest": "node scripts/loadtest.js",
-    "check": "node scripts/check-questions.js"
+    "check": "node scripts/check-questions.js && node scripts/check-secrets.js",
+    "check:secrets": "node scripts/check-secrets.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
