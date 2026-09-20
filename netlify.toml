@@ -1,0 +1,99 @@
+# ---------------------------------------------------------------------------
+# PMI UAE AGM 2026 — Netlify configuration
+# ---------------------------------------------------------------------------
+
+[build]
+  command   = "npm run build"
+  publish   = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions]
+  node_bundler = "esbuild"
+
+[dev]
+  command    = "vite"
+  targetPort = 5173
+  port       = 8888
+  framework  = "#custom"
+
+# --- Clean URLs -------------------------------------------------------------
+[[redirects]]
+  from = "/api/*"
+  to   = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/host"
+  to   = "/host.html"
+  status = 200
+
+[[redirects]]
+  from = "/screen"
+  to   = "/screen.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to   = "/admin.html"
+  status = 200
+
+# --- Caching ----------------------------------------------------------------
+# The heart of the scale strategy. /api/state is polled ~1×/sec by every
+# delegate; a 1-second edge cache collapses ~1,000 requests/sec into ~1
+# origin request/sec. stale-while-revalidate keeps responses instant during
+# the revalidation window.
+[[headers]]
+  for = "/api/state"
+  [headers.values]
+    Cache-Control            = "public, max-age=0, must-revalidate"
+    Netlify-CDN-Cache-Control = "public, max-age=1, stale-while-revalidate=4, durable"
+
+# Never cache writes or privileged reads.
+[[headers]]
+  for = "/api/answer"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/api/join"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/api/host-action"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/api/admin"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/api/export"
+  [headers.values]
+    Cache-Control = "no-store"
+
+# Fingerprinted build assets are immutable.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/logos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# --- Security ---------------------------------------------------------------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options         = "SAMEORIGIN"
+    X-Content-Type-Options  = "nosniff"
+    Referrer-Policy         = "strict-origin-when-cross-origin"
+    Permissions-Policy      = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
