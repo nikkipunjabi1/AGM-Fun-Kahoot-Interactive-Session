@@ -10,12 +10,30 @@ export function db() {
   if (client) return client
 
   const url = process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  // Supabase replaced the legacy `service_role` JWT with opaque "Secret keys"
+  // (sb_secret_...). Both work identically here — supabase-js passes either
+  // through as the apikey and bearer token, and both map to the service_role
+  // database role, which is what bypasses RLS. Accept either variable name so
+  // the project works whichever key the dashboard offered.
+  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !key) {
     throw new Error(
-      'Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY ' +
-      'in Netlify → Site configuration → Environment variables.'
+      'Supabase is not configured. Set SUPABASE_URL and SUPABASE_SECRET_KEY ' +
+      '(the "Secret key" from Settings → API Keys, starting sb_secret_) in ' +
+      'Netlify → Site configuration → Environment variables.'
+    )
+  }
+
+  // Guard against the most damaging misconfiguration: pasting the publishable
+  // key, which cannot bypass RLS. Every table denies anon outright, so the app
+  // would fail confusingly at request time instead of clearly at startup.
+  if (key.startsWith('sb_publishable_')) {
+    throw new Error(
+      'A PUBLISHABLE Supabase key was supplied. That key cannot bypass row level ' +
+      'security, so every query will be denied. Use the SECRET key (sb_secret_...) ' +
+      'from Settings → API Keys.'
     )
   }
 
